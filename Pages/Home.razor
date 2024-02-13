@@ -1,0 +1,78 @@
+@page "/"
+@using Imc.Models
+@inject NavigationManager NavigatioManager
+@inject IMCService IMCService
+
+<PageTitle>Home</PageTitle>
+
+<div class="container">
+    <div>
+        <div>
+            <h1 class="page-header">Cálculo de IMC</h1>
+        </div>
+        <div>
+            <input class="input-text text-muted" type="text" @bind="Altura" placeholder=" Altura (metros)" />
+        </div>
+        <br>
+        <div>
+            <input class="input-text text-muted" type="text" @bind="Peso" placeholder=" Peso (quilogramas)" />
+        </div>
+        <br>
+        <div>
+            <select class="input-text text-muted" @bind="Sexo">
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+            </select>
+        </div>
+        <br>
+        <div>
+            <br>
+            <input class="input" id="ThirdAge" type="checkbox" @bind="TerceiraIdade" />
+            <label for="ThirdAge"> Eu tenho 65 anos ou mais</label>
+        </div>
+        <br>
+        <button class="btnCalc" @onclick="CalcularIMC">Calcular meu IMC</button><br />
+        <br>
+        <button class="btnEntenda">Entenda o Cálculo</button>
+    </div>
+    <br/>
+    <div class="history-page">
+        @if (IMC > 0)
+        {
+            <NavLink href="/history">Seu IMC é: @IMC</NavLink>
+        }
+    </div>
+</div>
+
+@code {
+    private double Altura { get; set; }
+    private double Peso { get; set; }
+    private string Sexo { get; set; } = "M";
+    private bool TerceiraIdade { get; set; }
+    private double IMC { get; set; }
+
+    private void CalcularIMC()
+    {
+        // Calculando o IMC
+        double alturaMetros = Altura;
+        double pesoKg = Peso;
+        double imc = pesoKg / (alturaMetros * alturaMetros);
+
+        // Se for do sexo feminino, adiciona um ajuste
+        if (Sexo == "F")
+        {
+            imc *= 1.1;
+        }
+
+        // Se tiver mais de 65 anos, aplica outro ajuste
+        if (TerceiraIdade)
+        {
+            imc *= 1.1;
+        }
+
+        IMC = imc;
+
+        IMCService.SetIMC(imc);
+
+    }
+}
